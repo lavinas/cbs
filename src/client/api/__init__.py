@@ -1,6 +1,11 @@
 from flask_restx import Resource, Api
 from .schema import POST_OUT
 from .control import Control
+from ...util.settings import Settings
+from ...util.mysql import MySql
+
+setting = Settings()
+db = MySql(setting)
 
 def client_api(api: Api):
     api = api.namespace('client', description='client signup')

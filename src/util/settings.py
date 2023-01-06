@@ -3,8 +3,7 @@ import os
 import sys
 
 class Settings(object):
-    @staticmethod
-    def get_parameters(name, group=None):
+    def get_parameters(self, name, group=None):
         config = configparser.ConfigParser()
         config.read(
             os.path.join(os.path.dirname(__file__), "../../settings.ini")
