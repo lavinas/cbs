@@ -1,9 +1,7 @@
 
 from flask import Flask
 from flask_restx import Api
-
 from .client.api import client_api
-
 
 endpoints = {
     client_api
