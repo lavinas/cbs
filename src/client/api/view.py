@@ -18,7 +18,6 @@ def view(func):
             return error(401, 'invalid_credentials', 
                                     'The user credentials were incorrect.')
         except Exception as exp:
-            raise exp
             return error(500, 'internal_error', 
                                     'contact vooo admin')
     return inner
