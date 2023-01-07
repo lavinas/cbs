@@ -14,6 +14,7 @@ def client_api(api: Api):
     
     # main route
     @api.route('/')
+    @api.route('')
     class Client(Resource):
         # post
         @api.response(code=200, description="OK", 

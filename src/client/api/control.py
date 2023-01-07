@@ -17,10 +17,12 @@ class Control(object):
         args = parser.parse(POST_IN, request)
         args['surname'] = 'xxxx'
         model = Model(self.db)
+        self.db.connect()
         model.post(args)
-        model.close()
+        self.db.close()
         return {'ok': 'ok'}
     
 @parser.error_handler
 def handle_error(error, req, schema, *, error_status_code, error_headers):
     raise BadRequest(error)
+

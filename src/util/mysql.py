@@ -12,10 +12,15 @@ class MySql(object):
     def __init__(self, sett: Any):
         self.engine = get_engine(sett)
         self.conn = self.engine.connect()
- 
+        
+    def __del__(self):
+        self.engine.dispose()
+        
+    def connect(self):
+        self.conn = self.engine.connect()
+        
     def close(self):
         self.conn.close()
-        self.engine.dispose()
         
     def begin(self):
         self.trans = self.conn.begin_nested()
