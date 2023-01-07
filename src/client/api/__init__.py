@@ -3,16 +3,21 @@ from .schema import POST_OUT
 from .control import Control
 from ...util.settings import Settings
 from ...util.mysql import MySql
-
-setting = Settings()
-db = MySql(setting)
+from ...util.log import Log
 
 def client_api(api: Api):
-    api = api.namespace('client', description='client signup')
+    domain = 'client'
+    sett = Settings(domain)
+    db = MySql(sett)
+    log = Log(sett)
+    api = api.namespace(domain)
+    
+    # main route
     @api.route('/')
     class Client(Resource):
         # post
         @api.response(code=200, description="OK", 
                       model=api.schema_model("Auth", POST_OUT))
         def post(self):
-            return Control.post()
+            c = Control(sett, db, log)
+            return c.post()

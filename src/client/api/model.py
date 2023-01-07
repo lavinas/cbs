@@ -3,12 +3,15 @@ from typing import Any
 class Model(object):
     def __init__(self, conn: Any):
         self.conn = conn
+        
+    def close(self):
+        self.conn.close()        
     
     def post(self, args: dict):
         self.conn.begin()
-        self.conn.execute(sql_post, args)
+        self.conn.exec(sql_post, args)
         self.conn.commit()
-        self.conn.close()
+
         
 sql_post = '''
     insert into client (

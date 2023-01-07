@@ -1,3 +1,4 @@
+from typing import Any
 from datetime import datetime, timedelta
 from os.path import join, isfile
 from os import listdir, remove
@@ -10,10 +11,11 @@ dpattern = '%Y-%m-%d'
 dtpattern = '%Y-%m-%d - %H:%M:%S'
 
 class Log (object):
-    def __init__(self, path: str, domain: str):
-        self.path = path
-        self.domain = domain
-        self.file, self.now =  create(path, domain)
+    def __init__(self, sett: Any):
+        self.sett = sett
+        self.domain = self.sett.domain()
+        self.path = sett.get('log_path')
+        self.file, self.now =  create(self.path, self.domain)
     
     def close(self):
         if self.file is not None:
@@ -35,8 +37,8 @@ class Log (object):
             self.rotate()
             write(self.file, tag, message, code)
     
-    def zip(self):
-        pass
+    def zip(path: str):
+        zip_files(path)
 
 def create(path: str, domain: str):
     try:

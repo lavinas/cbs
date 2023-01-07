@@ -1,21 +1,24 @@
 from sqlalchemy import create_engine
 from typing import Any
 
-class MySql(object):
-    def __init__(self, settings: Any):
-        self.sett = settings
-        
-    def begin(self):
-        self.engine = get_engine(self.sett)
-        self.conn = self.engine.connect()
-        self.trans = self.conn.begin_nested()
+user_set = 'user'
+pass_set = 'pass'
+host_set = 'host'
+db_set = 'db'
+pool_set = 'pool_size'
+overflow_set = 'max_overflow'
 
+class MySql(object):
+    def __init__(self, sett: Any):
+        self.engine = get_engine(sett)
+        self.conn = self.engine.connect()
+ 
     def close(self):
         self.conn.close()
         self.engine.dispose()
         
-    def restart(self):
-        self.conn.begin_nested()
+    def begin(self):
+        self.trans = self.conn.begin_nested()
         
     def commit(self):
         self.trans.commit()
@@ -23,18 +26,20 @@ class MySql(object):
     def rollback(self):
         self.trans.rollback()
         
-    def execute(self, sql: str, params: dict) -> list:
+    def query(self, sql: str, params: dict) -> list:
         return list(self.conn.execute(sql, params))
-    
-def get_engine(setting: Any, domain: str) -> Any:
-    host = setting.get_parameters('host', domain)
-    user = setting.get_parameters('user', domain)
-    passw = setting.get_parameters('pass', domain)
-    db = setting.get_parameters('db', domain)
-    pool = int(setting.get_parameters('pool_size', domain))
-    max = int(setting.get_parameters('max_overflow', domain))
-    url = "mysql+pymysql://" + user + ":" + passw + "@" + host
-    if db is not None:
-        url += "/" + db
+
+    def exec(self, sql: str, params: dict) -> list:
+        self.conn.execute(sql, params)
+
+def get_engine(sett: Any) -> Any:
+    url = 'mysql+pymysql://{u}:{p}@{h}/{d}'.format(
+        u = sett.get(user_set),
+        p = sett.get(pass_set),
+        h = sett.get(host_set),
+        d = sett.get(db_set)
+    )
+    p = int(sett.get(pool_set))
+    m = int(sett.get(overflow_set))
     return create_engine(url, convert_unicode=True, echo=False, 
-                        pool_size=pool, max_overflow=max)
+                        pool_size=p, max_overflow=m)
