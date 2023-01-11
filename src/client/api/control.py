@@ -7,22 +7,67 @@ from .view import view
 from .model import Model
 
 class Control(object):
-    def __init__(self, sett: Any, db: Any, log: Any):
+    def __init__(self, sett: Any, db: Any, log: Any, doc: Any):
         self.sett = sett
         self.db = db
         self.log = log
+        self.doc = doc
                   
     @view
     def post(self):
-        args = parser.parse(POST_IN, request)
-        args['surname'] = 'xxxx'
-        model = Model(self.db)
+        args = dict(parser.parse(POST_IN, request))
+        verify(args)
         self.db.connect()
+        model = Model(self.db)
+        args['nickname'] = nickname(model, args['name'])
         model.post(args)
         self.db.close()
-        return {'ok': 'ok'}
+        return {'nickname': args['nickname']}
     
 @parser.error_handler
 def handle_error(error, req, schema, *, error_status_code, error_headers):
     raise BadRequest(error)
 
+def verify(args: dict, doc: Any):
+    if args['name'].strip().strip(' ') < 2:
+        raise BadRequest('Name should have name and surname')
+    if doc.type(args['document']) is None:
+        raise BadRequest('Document should be CPF or CNPJ')
+    
+def nickname(model: Model, name: str) -> str:
+    r = nickname_filled(model, name)
+    if r is not None:
+        return r
+    r = nickname_surnames(model, name)
+    if r is not None:
+        return r
+    return nickname_numbers(model, name)
+ 
+def nickname_filled(model: Model, name: str) -> str:
+    r = name.lower().replace(' ', '_')
+    if model.nick_count(r) == 0:
+        return r
+    return None
+    
+def nickname_surnames(model: Model, name: str) -> str:
+    names = name.split(' ')
+    f = names[0].lower()
+    r = None
+    for i in range(len(names) - 1, 1, -1):
+        s = names[i].lower()
+        n = '{}_{}'.format(f, s)
+        if model.nick_count(n) == 0:
+            r = n
+            break
+    return r
+ 
+def nickname_numbers(model: Model, name: str) -> str:
+    names = name.split(name)
+    f = names[0].lower()
+    s = names[len(names)-1].lower()
+    i = 1
+    r = '{}_{}_{}'.format(f, s, i)
+    while model.nick_count(r) == 0:
+        i += 1
+        r = '{}_{}_{}'.format(f, s, i)
+    return r

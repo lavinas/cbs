@@ -8,6 +8,11 @@ class Model(object):
         self.conn.begin()
         self.conn.exec(sql_post, args)
         self.conn.commit()
+        
+    def nick_count(self, nick) -> int:
+        p = {'nick': nick}
+        r = self.conn.query(sql_nick_count)
+        return r[0].count
              
 sql_post = '''
     insert into client (
@@ -15,4 +20,10 @@ sql_post = '''
     ) values (
         %(name)s, %(surname)s, %(document)s, %(phone)s, %(email)s
     );
+'''
+
+sql_nick_count = '''
+    select count(1) count
+      from client
+    where nickname = %(nick)s;
 '''
