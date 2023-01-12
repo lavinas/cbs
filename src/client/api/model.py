@@ -11,14 +11,14 @@ class Model(object):
         
     def nick_count(self, nick) -> int:
         p = {'nick': nick}
-        r = self.conn.query(sql_nick_count)
+        r = self.conn.query(sql_nick_count, p)
         return r[0].count
              
 sql_post = '''
     insert into client (
-        name, surname, document, phone, email
+        name, nickname, document, phone, email
     ) values (
-        %(name)s, %(surname)s, %(document)s, %(phone)s, %(email)s
+        %(name)s, %(nickname)s, %(document)s, %(phone)s, %(email)s
     );
 '''
 

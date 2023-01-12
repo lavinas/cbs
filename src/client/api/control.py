@@ -11,11 +11,10 @@ class Control(object):
         self.sett = sett
         self.db = db
         self.log = log
-                  
+        
     @view
     def post(self):
         args = dict(parser.parse(POST_IN, request))
-        verify(args)
         self.db.connect()
         model = Model(self.db)
         args['nickname'] = nickname(model, args['name'])
@@ -26,16 +25,7 @@ class Control(object):
 @parser.error_handler
 def handle_error(error, req, schema, *, error_status_code, error_headers):
     raise BadRequest(error)
-
-def verify(args: dict, doc: Any, email: Any):
-    if args['name'].strip().strip(' ') < 2:
-        raise BadRequest('Name should have name and surname')
-    if doc.type(args['document']) is None:
-        raise BadRequest('Document should be CPF or CNPJ')
-    if not email.isValid(args['email']):
-        raise BadRequest('Email is not valid')
-    
-    
+        
 def nickname(model: Model, name: str) -> str:
     r = nickname_filled(model, name)
     if r is not None:

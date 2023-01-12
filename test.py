@@ -1,5 +1,6 @@
-from src.util.email import Email
+from validate_docbr import CPF, CNPJ
 
-email = 'lavinas@gmail.com'
-print (Email().isValid(email))
+doc = '04417932824'
+x = CPF().validate(doc)
+print(x)
 
