@@ -7,11 +7,10 @@ from .view import view
 from .model import Model
 
 class Control(object):
-    def __init__(self, sett: Any, db: Any, log: Any, doc: Any):
+    def __init__(self, sett: Any, db: Any, log: Any):
         self.sett = sett
         self.db = db
         self.log = log
-        self.doc = doc
                   
     @view
     def post(self):
@@ -28,11 +27,14 @@ class Control(object):
 def handle_error(error, req, schema, *, error_status_code, error_headers):
     raise BadRequest(error)
 
-def verify(args: dict, doc: Any):
+def verify(args: dict, doc: Any, email: Any):
     if args['name'].strip().strip(' ') < 2:
         raise BadRequest('Name should have name and surname')
     if doc.type(args['document']) is None:
         raise BadRequest('Document should be CPF or CNPJ')
+    if not email.isValid(args['email']):
+        raise BadRequest('Email is not valid')
+    
     
 def nickname(model: Model, name: str) -> str:
     r = nickname_filled(model, name)

@@ -1,2 +1,5 @@
-for i in range(2, 0, -1):
-    print(i)
+from src.util.email import Email
+
+email = 'lavinas@gmail.com'
+print (Email().isValid(email))
+
