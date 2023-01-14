@@ -2,7 +2,7 @@ from flask import jsonify, Response
 from typing import Any
 from werkzeug.exceptions import (
     BadRequest,
-    Unauthorized, Forbidden
+    Unauthorized, Forbidden, Conflict
 )
 
 def view(func):
@@ -17,6 +17,8 @@ def view(func):
         except Unauthorized as exp:
             return error(401, 'invalid_credentials', 
                                     'The user credentials were incorrect.')
+        except Conflict as exp:
+            return error(409, 'conflict', str(exp.description))            
         except Exception as exp:
             raise exp
             return error(500, 'internal_error', 

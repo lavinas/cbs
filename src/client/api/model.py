@@ -1,4 +1,5 @@
 from typing import Any
+from decimal import Decimal
 
 class Model(object):
     def __init__(self, conn: Any):
@@ -13,6 +14,12 @@ class Model(object):
         p = {'nick': nick}
         r = self.conn.query(sql_nick_count, p)
         return r[0].count
+    
+    def document_count(self, document: Decimal) -> int:
+        p = {'document': document}
+        r = self.conn.query(sql_document_count, p)
+        return r[0].count
+    
              
 sql_post = '''
     insert into client (
@@ -26,4 +33,10 @@ sql_nick_count = '''
     select count(1) count
       from client
     where nickname = %(nick)s;
+'''
+
+sql_document_count = '''
+    select count(1) count
+      from client
+    where document = %(document)s;
 '''

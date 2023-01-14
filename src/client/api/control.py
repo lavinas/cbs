@@ -1,6 +1,7 @@
+from string import capwords
 from typing import Any
 from webargs.flaskparser import parser
-from werkzeug.exceptions import BadRequest
+from werkzeug.exceptions import BadRequest, Conflict
 from flask import request
 from .schema import POST_IN
 from .view import view
@@ -15,27 +16,37 @@ class Control(object):
     @view
     def post(self):
         args = dict(parser.parse(POST_IN, request))
-        self.db.connect()
-        model = Model(self.db)
-        args['nickname'] = nickname(model, args['name'])
-        model.post(args)
-        self.db.close()
-        return {'nickname': args['nickname']}
+        try:
+            self.db.connect()
+            model = Model(self.db)
+            duplicity(model, args)
+            args = format(args)
+            args['nickname'] = nickname(model, args)
+            model.post(args)
+            self.db.close()
+            self.log.info('OK', str(args))
+            return args
+        except Exception as exp:
+            self.log.info('Error', '{}: {}'.format(exp, str(args)))
+            raise exp
     
 @parser.error_handler
 def handle_error(error, req, schema, *, error_status_code, error_headers):
     raise BadRequest(error)
         
-def nickname(model: Model, name: str) -> str:
-    r = nickname_filled(model, name)
+def nickname(model: Model, args: dict) -> str:
+    if 'nickname' in args:
+        r = nickname_filled(model, args['nickname'])
+        if r is not None:
+            return r
+    r = nickname_surnames(model, args['name'])
     if r is not None:
         return r
-    r = nickname_surnames(model, name)
-    if r is not None:
-        return r
-    return nickname_numbers(model, name)
+    return nickname_numbers(model, args['name'])
  
 def nickname_filled(model: Model, name: str) -> str:
+    if name is None:
+        return None
     r = name.lower().replace(' ', '_')
     if model.nick_count(r) == 0:
         return r
@@ -45,7 +56,7 @@ def nickname_surnames(model: Model, name: str) -> str:
     names = name.split(' ')
     f = names[0].lower()
     r = None
-    for i in range(len(names) - 1, 1, -1):
+    for i in range(len(names) - 1, 0, -1):
         s = names[i].lower()
         n = '{}_{}'.format(f, s)
         if model.nick_count(n) == 0:
@@ -54,12 +65,23 @@ def nickname_surnames(model: Model, name: str) -> str:
     return r
  
 def nickname_numbers(model: Model, name: str) -> str:
-    names = name.split(name)
+    names = name.split(' ')
     f = names[0].lower()
     s = names[len(names)-1].lower()
     i = 1
-    r = '{}_{}_{}'.format(f, s, i)
-    while model.nick_count(r) == 0:
+    r = '{f}_{s}_{i}'.format(f=f, s=s, i=i)
+    while model.nick_count(r) != 0:
         i += 1
-        r = '{}_{}_{}'.format(f, s, i)
+        r = '{f}_{s}_{i}'.format(f=f, s=s, i=i)
     return r
+
+def duplicity(model: Model, args: dict) -> bool:
+    if model.document_count(args['document']) != 0:
+        e = Conflict()
+        e.description = 'Document {} is already registered'.\
+            format(args['document'])
+        raise e
+    
+def format(args: dict) -> dict:
+    args['name'] = capwords(args['name'])
+    return args
