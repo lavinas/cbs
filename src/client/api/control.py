@@ -27,7 +27,7 @@ class Control(object):
             self.log.info('OK', str(args))
             return args
         except Exception as exp:
-            self.log.info('Error', '{}: {}'.format(exp, str(args)))
+            self.log.error('Error', '{}: {}'.format(exp, str(args)))
             raise exp
     
 @parser.error_handler
