@@ -29,6 +29,10 @@ class Control(object):
         except Exception as exp:
             self.log.error('Error', '{}: {}'.format(exp, str(args)))
             raise exp
+    @view    
+    def get(self):
+        args = dict(parser.parse(POST_IN, request))
+        
     
 @parser.error_handler
 def handle_error(error, req, schema, *, error_status_code, error_headers):
