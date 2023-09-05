@@ -4,19 +4,25 @@ from ...util.settings import Settings
 from ...util.mysql import MySql
 from ...util.log import Log
 # modules
-from .post.control import Post
+from .new.control import NewClient
 
 
 def client_api(api: Api):
-    domain = 'client'
-    sett = Settings(domain)
+    api = api.namespace('client')
+    sett = Settings('client')
     db = MySql(sett)
     log = Log(sett)
-    api = api.namespace(domain)
     
     @api.route('/')
     @api.route('')
-    class Client(Resource):
+    class Default(Resource):
+        def get(self):
+            return 'Pong'
         def post(self):
-            c = Post(sett, db, log)
-            return c.run()
+            return 'Pong'
+
+    @api.route('/new')
+    class New(Resource):
+        def post(self):
+            return NewClient(sett, db, log).run()
+

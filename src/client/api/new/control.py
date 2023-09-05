@@ -9,7 +9,7 @@ from .model import Model
 from re import sub
 from decimal import Decimal
 
-class Post(object):
+class NewClient(object):
     def __init__(self, sett: Any, db: Any, log: Any):
         self.sett = sett
         self.db = db
@@ -24,7 +24,7 @@ class Post(object):
             args = format(args)
             duplicity(model, args)
             args['nickname'] = nickname(model, args)
-            model.post(args)
+            model.insert(args)
             self.db.close()
             self.log.info('OK', str(args))
             return args

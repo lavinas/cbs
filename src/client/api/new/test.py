@@ -1,13 +1,11 @@
 import unittest
 
-class TestClientPostControl(unittest.TestCase):
-
+class TestClientNew(unittest.TestCase):
     def test_run_ok(self):
         self.assertTrue(True)
     
     def setUp(self):
         pass
-    
     
 class Settings(object):
     pass
@@ -17,7 +15,6 @@ class Db(object):
 
 class Log(object):
     pass
-
 
 if __name__ == '__main__':
     unittest.main()

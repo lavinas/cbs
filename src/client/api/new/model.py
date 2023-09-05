@@ -5,9 +5,9 @@ class Model(object):
     def __init__(self, conn: Any):
         self.conn = conn
               
-    def post(self, args: dict):
+    def insert(self, args: dict):
         self.conn.begin()
-        self.conn.exec(sql_post, args)
+        self.conn.exec(sql_insert, args)
         self.conn.commit()
         
     def nick_count(self, nick) -> int:
@@ -21,7 +21,7 @@ class Model(object):
         return r[0].count
     
              
-sql_post = '''
+sql_insert = '''
     insert into client (
         name, nickname, document, phone, email
     ) values (
