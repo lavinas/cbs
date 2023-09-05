@@ -1,6 +1,6 @@
 from flask_restx import Resource, Api
-from .schema import POST_OUT
-from .control import Control
+from .schema.schema import POST_OUT
+from .control.control import Control
 from ...util.settings import Settings
 from ...util.mysql import MySql
 from ...util.log import Log

@@ -1,19 +1,30 @@
 from marshmallow import fields
 from validate_docbr import CPF, CNPJ
 from email_validator import validate_email, EmailNotValidError
-from decimal import Decimal
+from re import findall, sub
 
 class Validation(object):
     def name(value: str) -> bool:
         if len(value.strip().split(' ')) < 2:
             return False
         return True
-    def document(value: Decimal) -> bool:
+    def nickname(value: str) -> bool:
+        if len(value.strip().split(' ')) != 1:
+            return False
+    def document(value: str) -> bool:
         if CPF().validate(str(value).zfill(11)):
             return True
         if CNPJ().validate(str(value).zfill(14)):
             return True
         return False
+    def phone(value: str) -> bool:
+        value = sub('\D', '', value)
+        pat = '([0-9]{2,3})?([0-9]{2})([0-9]{4,5})([0-9]{4})'
+        if findall(pat, value):
+            return True
+        else:
+            return False
+        
     def email(value: str) -> bool:
         try:
             validate_email(value)
@@ -22,10 +33,10 @@ class Validation(object):
             return False
     
 POST_IN = {
-    "surname": fields.Str(required=False),
     "name": fields.Str(required=True, validate=Validation.name),
-    "document": fields.Decimal(required=True, validate=Validation.document),
-    "phone": fields.Decimal(required=True),
+    "nickname": fields.Str(required=False, validate=Validation.nickname),
+    "document": fields.Str(required=True, validate=Validation.document),
+    "phone": fields.Str(required=True, validate=Validation.phone),
     "email": fields.Str(required=True, validate=Validation.email)
 }
 
@@ -33,6 +44,6 @@ POST_OUT = {
     "type": "object",
     "properties": {
         "id": {"type": "integer"},
-        "surname": {"type": "string"}
+        "nick": {"type": "string"}
     }
 }

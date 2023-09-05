@@ -20,7 +20,6 @@ def view(func):
         except Conflict as exp:
             return error(409, 'conflict', str(exp.description))            
         except Exception as exp:
-            raise exp
             return error(500, 'internal_error', 
                                     'contact vooo admin')
     return inner
