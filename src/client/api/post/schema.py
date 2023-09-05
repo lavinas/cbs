@@ -24,7 +24,6 @@ class Validation(object):
             return True
         else:
             return False
-        
     def email(value: str) -> bool:
         try:
             validate_email(value)
