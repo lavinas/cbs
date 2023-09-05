@@ -1,9 +1,11 @@
 from flask_restx import Resource, Api
-from .schema.schema import POST_OUT
-from .control.control import Control
+# tools
 from ...util.settings import Settings
 from ...util.mysql import MySql
 from ...util.log import Log
+# modules
+from .post.control import Post
+
 
 def client_api(api: Api):
     domain = 'client'
@@ -12,13 +14,9 @@ def client_api(api: Api):
     log = Log(sett)
     api = api.namespace(domain)
     
-    # main route
     @api.route('/')
     @api.route('')
     class Client(Resource):
-        # post
-        @api.response(code=200, description="OK", 
-                      model=api.schema_model("Auth", POST_OUT))
         def post(self):
-            c = Control(sett, db, log)
-            return c.post()
+            c = Post(sett, db, log)
+            return c.run()

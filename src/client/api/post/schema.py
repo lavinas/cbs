@@ -32,7 +32,7 @@ class Validation(object):
         except EmailNotValidError:
             return False
     
-POST_IN = {
+IN = {
     "name": fields.Str(required=True, validate=Validation.name),
     "nickname": fields.Str(required=False, validate=Validation.nickname),
     "document": fields.Str(required=True, validate=Validation.document),
@@ -40,10 +40,3 @@ POST_IN = {
     "email": fields.Str(required=True, validate=Validation.email)
 }
 
-POST_OUT = {
-    "type": "object",
-    "properties": {
-        "id": {"type": "integer"},
-        "nick": {"type": "string"}
-    }
-}

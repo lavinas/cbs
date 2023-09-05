@@ -3,26 +3,26 @@ from typing import Any
 from webargs.flaskparser import parser
 from werkzeug.exceptions import BadRequest, Conflict
 from flask import request
-from ..schema.schema import POST_IN
-from ..view.view import view
-from ..model.model import Model
+from .schema import IN
+from .view import view
+from .model import Model
 from re import sub
 from decimal import Decimal
 
-class Control(object):
+class Post(object):
     def __init__(self, sett: Any, db: Any, log: Any):
         self.sett = sett
         self.db = db
         self.log = log
         
     @view
-    def post(self):
-        args = dict(parser.parse(POST_IN, request))
+    def run(self):
+        args = dict(parser.parse(IN, request))
         try:
             self.db.connect()
             model = Model(self.db)
-            duplicity(model, args)
             args = format(args)
+            duplicity(model, args)
             args['nickname'] = nickname(model, args)
             model.post(args)
             self.db.close()
@@ -31,9 +31,6 @@ class Control(object):
         except Exception as exp:
             self.log.error('Error', '{}: {}'.format(exp, str(args)))
             raise exp
-    @view    
-    def get(self):
-        args = dict(parser.parse(POST_IN, request))
         
 @parser.error_handler
 def handle_error(error, req, schema, *, error_status_code, error_headers):
